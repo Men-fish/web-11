@@ -1,16 +1,30 @@
-PROJECT_DIR = $(shell pwd)
-PROJECT_BIN = $(PROJECT_DIR)/bin
-$(shell [ -f bin] || mkdir -p $(PROJECT_BIN))
-PATH := $(PROJECT_BIN):$(PATH)
 
-GOLANGCI_LINT = $(PROJECT_BIN)/golangci-lint
+AUTH_DIR = cmd/auth
+COUNT_DIR = cmd/count
+HELLO_DIR = cmd/hello
+QUERY_DIR = cmd/query
 
-.PHONY: .install-linter
-.install-linter:
-	### INSTALL GOLANGCI_LINT ###
-	[ -f $(PROJECT_BIN)/golangci-lint ] || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(PROJECT_BIN) v1.59.1
+# Цель для запуска всех сервисов
+.PHONY: all
+all: run-auth run-count run-hello run-query
 
-.PHONY: lint
-lint: .install-linter
-	### RUN GOALNGCI-LINT ###
-	$(GOLANGCI_LINT) run ./... --config=./.golangci.yaml
+# Цели для запуска каждого сервиса в фоне
+.PHONY: run-auth
+run-auth:
+	@echo "Running auth service..."
+	go run $(AUTH_DIR)/main.go &
+
+.PHONY: run-count
+run-count:
+	@echo "Running count service..."
+	go run $(COUNT_DIR)/main.go &
+
+.PHONY: run-hello
+run-hello:
+	@echo "Running hello service..."
+	go run $(HELLO_DIR)/main.go &
+
+.PHONY: run-query
+run-query:
+	@echo "Running query service..."
+	go run $(QUERY_DIR)/main.go &
